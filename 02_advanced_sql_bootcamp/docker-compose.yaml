@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  dcs-postgres:
+    image: postgres:13
+    container_name: dcs-postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: mydatabase
+    ports:
+      - 5432:5432
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+  pgadmin4:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@domain.com
+      PGADMIN_DEFAULT_PASSWORD: secret
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin/data
+    ports:
+      - 89:80
+networks:
+  default:
+    name: postgres-network
