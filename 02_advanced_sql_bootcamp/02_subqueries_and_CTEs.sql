@@ -99,3 +99,33 @@ HAVING STRING_AGG(DISTINCT surgical_type, ',') LIKE
 	ALL(
 		SELECT STRING_AGG(DISTINCT surgical_type, ',')
 			FROM general_hospital.surgical_encounters);
+			
+-- Subqueries with EXISTS
+--- The query below selects all the records of p that are common to the 
+--- records of s
+SELECT p.*
+FROM general_hospital.patients p
+	WHERE EXISTS (
+		SELECT 1
+		FROM general_hospital.surgical_encounters s
+			WHERE s.master_patient_id = p.master_patient_id);
+			
+-- Recursive CTEs (WITH clauses)
+WITH RECURSIVE orders as (
+	-- Base query
+	SELECT 
+		order_procedure_id, 
+		order_parent_order_id, 
+		0 as level
+	FROM general_hospital.orders_procedures
+	WHERE order_parent_order_id is NULL
+		UNION ALL
+	-- Recursive query
+	SELECT 
+		op.order_procedure_id, 
+		op.order_parent_order_id, 
+		o.level + 1 as level
+	FROM general_hospital.orders_procedures op
+	INNER JOIN orders o
+		ON op.order_parent_order_id = o.order_procedure_id)
+SELECT * FROM orders WHERE level != 0;
